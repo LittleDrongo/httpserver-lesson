@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("Ошибка сериализации JSON: %v\n", err)
 	} else {
-		fmt.Println("Сериализация прошла успешно")
+		fmt.Println("1. Сериализация прошла успешно")
 	}
 
 	err = samples.UnmarshallSample()
@@ -20,6 +20,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Ошибка де-сериализации JSON: %v\n", err)
 	} else {
-		fmt.Println("Сериализация прошла успешно")
+		fmt.Println("2. Де-сериализация прошла успешно")
 	}
 }
