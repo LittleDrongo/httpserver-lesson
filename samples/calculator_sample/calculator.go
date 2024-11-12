@@ -120,7 +120,6 @@ func Div(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(200) // StatusCode для запроса
 
 	req := Request{
-		CalcData:   calculator,
 		LogMessage: "Операция деления",
 	}
 	{ //исп блок
@@ -130,6 +129,8 @@ func Div(writer http.ResponseWriter, request *http.Request) {
 			calculator.Result = float64(calculator.FirstNumber) / float64(calculator.SecondNumber)
 		}
 	}
+
+	req.CalcData = calculator
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
 }
