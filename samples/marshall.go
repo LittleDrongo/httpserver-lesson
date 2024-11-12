@@ -2,9 +2,28 @@ package samples
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 )
+
+func MarshalSamples() {
+
+	err := MarshallSample()
+	if err != nil {
+		fmt.Printf("Ошибка сериализации JSON: %v\n", err)
+	} else {
+		fmt.Println("1. Сериализация прошла успешно")
+	}
+
+	err = UnmarshallSample()
+
+	if err != nil {
+		fmt.Printf("Ошибка де-сериализации JSON: %v\n", err)
+	} else {
+		fmt.Println("2. Де-сериализация прошла успешно")
+	}
+}
 
 func MarshallSample() error {
 	type User struct {
