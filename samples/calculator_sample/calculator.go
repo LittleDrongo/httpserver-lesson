@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -41,6 +42,7 @@ var (
 	// Порт запуска приложения
 	port       string = `8080`
 	calculator CalcData
+	LogHistory []LogMessages
 )
 
 type CalcData struct {
@@ -51,8 +53,22 @@ type CalcData struct {
 }
 
 type Request struct {
-	CalcData   CalcData `json:"calc_data"`
-	LogMessage string   `json:"log_message"`
+	CalcData CalcData      `json:"calc_data"`
+	Message  string        `json:"message"`
+	History  []LogMessages `json:"history"`
+}
+type LogMessages struct {
+	Date    time.Time `json:"date"`
+	Message string    `json:"message"`
+}
+
+func newLogMessage(msg string) *LogMessages {
+
+	return &LogMessages{
+		Date:    time.Now(),
+		Message: msg,
+	}
+
 }
 
 func CalculatorSample() {
@@ -70,6 +86,7 @@ func CalculatorSample() {
 	router.HandleFunc("/sub", Sub).Methods("GET")
 	router.HandleFunc("/mul", Mul).Methods("GET")
 	router.HandleFunc("/div", Div).Methods("GET")
+	router.HandleFunc("/clear", Clear).Methods("GET")
 
 	log.Println("Router configured successfully! Let's go!")
 	log.Fatal(http.ListenAndServe(":"+port, router))
@@ -86,9 +103,12 @@ func GetFirst(writer http.ResponseWriter, request *http.Request) {
 		calculator.FirstNumber = float64(randInt)
 	}
 
+	LogHistory = append(LogHistory, *newLogMessage("Заполнено случайное первое число"))
+
 	req := Request{
-		CalcData:   calculator,
-		LogMessage: "Заполнено случайное первое число",
+		CalcData: calculator,
+		Message:  "Заполнено случайное первое число",
+		History:  LogHistory,
 	}
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
@@ -105,12 +125,35 @@ func GetSecond(writer http.ResponseWriter, request *http.Request) {
 		calculator.SecondNumber = float64(randInt)
 	}
 
+	LogHistory = append(LogHistory, *newLogMessage("Заполнено случайное второе число"))
+
 	req := Request{
-		CalcData:   calculator,
-		LogMessage: "Заполнено случайное второе число",
+		CalcData: calculator,
+		Message:  "Заполнено случайное второе число",
+		History:  LogHistory,
 	}
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
+}
+
+func Clear(writer http.ResponseWriter, request *http.Request) {
+	// Прописывать хедеры .
+	writer.Header().Set("Content-Type", "application/json")
+	log.Println("Clear operations API")
+	writer.WriteHeader(200) // StatusCode для запроса
+
+	empty := CalcData{}
+	calculator = empty
+
+	LogHistory = append(LogHistory, *newLogMessage("Параметры очищены"))
+
+	req := Request{
+		CalcData: calculator,
+		Message:  "Параметры очищены",
+		History:  LogHistory,
+	}
+	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
+
 }
 
 func Div(writer http.ResponseWriter, request *http.Request) {
@@ -120,17 +163,22 @@ func Div(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(200) // StatusCode для запроса
 
 	req := Request{
-		LogMessage: "Операция деления",
+		Message: "Операция деления",
 	}
 	{ //исп блок
 		if calculator.SecondNumber == 0 {
+
+			req.CalcData = calculator
 			req.CalcData.ErrorMessage = "Нельзя делить на ноль"
+			LogHistory = append(LogHistory, *newLogMessage("Операция деления не выполнена"))
 		} else {
 			calculator.Result = float64(calculator.FirstNumber) / float64(calculator.SecondNumber)
+			LogHistory = append(LogHistory, *newLogMessage("Операция деления выполнена"))
+			req.CalcData = calculator
 		}
 	}
 
-	req.CalcData = calculator
+	req.History = LogHistory
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
 }
@@ -145,9 +193,12 @@ func Mul(writer http.ResponseWriter, request *http.Request) {
 		calculator.Result = float64(calculator.FirstNumber) * float64(calculator.SecondNumber)
 	}
 
+	LogHistory = append(LogHistory, *newLogMessage("Операция умножения"))
+
 	req := Request{
-		CalcData:   calculator,
-		LogMessage: "Операция умножения",
+		CalcData: calculator,
+		Message:  "Операция умножения",
+		History:  LogHistory,
 	}
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
@@ -163,9 +214,12 @@ func Add(writer http.ResponseWriter, request *http.Request) {
 		calculator.Result = float64(calculator.FirstNumber + calculator.SecondNumber)
 	}
 
+	LogHistory = append(LogHistory, *newLogMessage("Операция сложения"))
+
 	req := Request{
-		CalcData:   calculator,
-		LogMessage: "Операция сложения",
+		CalcData: calculator,
+		Message:  "Операция сложения",
+		History:  LogHistory,
 	}
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
@@ -180,10 +234,12 @@ func Sub(writer http.ResponseWriter, request *http.Request) {
 	{ //исп блок
 		calculator.Result = float64(calculator.FirstNumber - calculator.SecondNumber)
 	}
+	LogHistory = append(LogHistory, *newLogMessage("Операция вычитания"))
 
 	req := Request{
-		CalcData:   calculator,
-		LogMessage: "Операция вычитания",
+		CalcData: calculator,
+		Message:  "Операция вычитания",
+		History:  LogHistory,
 	}
 
 	json.NewEncoder(writer).Encode(req) // Сериализация + запись в writer
@@ -203,6 +259,7 @@ func GetInfo(writer http.ResponseWriter, request *http.Request) {
 "/sub"    Разность
 "/mul"    Произведение
 "/div"    Деление
+"/clear"    Обнуление данных калькулятора
 `
 	writer.Write([]byte(message))
 	// json.NewEncoder(writer).Encode(message) // Сериализация + запись в writer
