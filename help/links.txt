@@ -1,0 +1,3 @@
+https://developer.mozilla.org/ru/docs/Web/HTTP/Status
+https://gist.github.com/Hombrer/95e3761168045a261a73e8c172961f9f
+https://github.com/hombrer/Go2_12112024
