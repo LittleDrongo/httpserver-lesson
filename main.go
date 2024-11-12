@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/LittleDrongo/httpserver-lesson/samples/pizza_sample"
+	"github.com/LittleDrongo/httpserver-lesson/samples/calculator_sample"
 )
 
 func main() {
-	pizza_sample.PizzaSample()
+	calculator_sample.CalculatorSample()
 	// samples.SimpleHttplListen()
 
 }
