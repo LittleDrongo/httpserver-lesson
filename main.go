@@ -8,6 +8,10 @@ import (
 
 func main() {
 
+}
+
+func marshalSamples() {
+
 	err := samples.MarshallSample()
 	if err != nil {
 		fmt.Printf("Ошибка сериализации JSON: %v\n", err)

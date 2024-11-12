@@ -37,7 +37,7 @@ func UnmarshallSample() error {
 
 	err = json.Unmarshal(fileData, &importedUser)
 
-	fmt.Println("Строковое представление объекта данных JSOn:")
+	fmt.Println("Строковое представление объекта данных JSON:")
 	fmt.Println(string(fileData))
 
 	fmt.Printf("importedUser: \n%v\n", importedUser)
