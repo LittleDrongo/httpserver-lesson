@@ -21,7 +21,7 @@ func MarshallSample() error {
 
 	user := User{
 		Name:    "Ivan",
-		Age:     30,
+		Age:     32,
 		Email:   "",
 		IsAdmin: true,
 	}
